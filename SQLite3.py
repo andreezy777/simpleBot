@@ -22,8 +22,6 @@ class SQLighter:
         print("Python Variables inserted successfully into SqliteDb_developers table")
 
 
-
-
     def close(self):
         """ Закрываем текущее соединение с БД """
         self.connection.close()
