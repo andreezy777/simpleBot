@@ -11,12 +11,12 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('SELECT * FROM Schedule').fetchall()
 
-    def write_to(self, chat_id, username, dayofweek):
+    def write_to(self, chat_id, user_id, username, dayofweek):
         sqlite_insert_with_param = """INSERT INTO Schedule
-                                 (ChatID, User, DayOfWeek) 
-                                 VALUES (?, ?, ?);"""
+                                 (ChatID, UserID, User, DayOfWeek) 
+                                 VALUES (?, ?, ?, ?);"""
 
-        data_tuple = (chat_id, username, dayofweek)
+        data_tuple = (chat_id, user_id, username, dayofweek)
         self.cursor.execute(sqlite_insert_with_param, data_tuple)
         self.connection.commit()
         print("Python Variables inserted successfully into SqliteDb_developers table")
@@ -28,9 +28,9 @@ class SQLighter:
                                         WHERE s.User = ?''', [username]).fetchall()
 
 
-    def getID(self):
+    def getID(self, user_id):
         with self.connection:
-            return self.cursor.execute('''SELECT TOP 1 ID FROM Table ORDER BY ID DESC''')
+            return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE UserID=? LIMIT 1''', [user_id]).fetchall()
 
     def close(self):
         """ Закрываем текущее соединение с БД """
