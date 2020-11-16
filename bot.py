@@ -20,9 +20,13 @@ def repeat_all_messages(message):  # Название функции не игр
     read_from_DB = db_worker.read_my_data(username)
 
     bot.send_message(message.chat.id,
+<<<<<<< HEAD
                      "У вас запланированы прогулки на следующие дни: {}".format(''.join(str(x) for x in read_from_DB).
                                                                                 replace('(', '').replace(')', '').
                                                                                 replace('\'', ''))[:-1])
+=======
+                    "У вас запланированы прогулки на следующие дни: {}".format(''.join(str(x) for x in read_from_DB).replace('(','').replace(')','').replace('\'',''))[:-1])
+>>>>>>> 16bd6bbf704668784be21ed24a230d1af0176c39
     db_worker.close()
 
 
