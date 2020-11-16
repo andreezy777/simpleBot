@@ -30,6 +30,6 @@ def repeat_all_messages(message):  # Название функции не игр
 # def getuserid(ID):  # Название функции не играет никакой роли, в принципе
 #     userid = ID.chat.id
 
-
+testamend
 if __name__ == '__main__':
     bot.polling(none_stop=True)
