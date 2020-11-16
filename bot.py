@@ -16,6 +16,10 @@ def repeat_all_messages(message):  # Название функции не игр
     bot.send_message(message.chat.id, "{}({}) планирует прогулку в эту/это/этот: {}".format(name, username, message.text))
     db_worker = SQLighter(config.database)
     write_to_DB = db_worker.write_to(username, name, message.text)
+    read_from_DB = db_worker.read_my_data(username)
+
+    bot.send_message(message.chat.id,
+                    "У вас запланированы прогулки на следующие дни: {}".format(''.join(str(x) for x in read_from_DB).replace('(','').replace(')','').replace('\'',''))[:-1])
     db_worker.close()
 
 

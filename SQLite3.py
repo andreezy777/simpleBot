@@ -21,6 +21,11 @@ class SQLighter:
         self.connection.commit()
         print("Python Variables inserted successfully into SqliteDb_developers table")
 
+    def read_my_data(self, username):
+        with self.connection:
+            return self.cursor.execute('''SELECT s.DayOfWeek FROM Schedule s
+                                        WHERE s.User = ?''', [username]).fetchall()
+
 
     def close(self):
         """ Закрываем текущее соединение с БД """
