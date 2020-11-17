@@ -12,29 +12,36 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('SELECT * FROM Schedule').fetchall()
 
-    def write_to(self, chat_id, user_id, username, dayofweek):
+    def write_to(self, chat_id, user_id, username, dayofweek, user_with_id):
         sqlite_insert_with_param = """INSERT INTO Schedule
-                                 (ChatID, UserID, User, DayOfWeek) 
-                                 VALUES (?, ?, ?, ?);"""
-        data_tuple = (chat_id, user_id, username, dayofweek)
+                                 (ChatID, UserID, User, DayOfWeek,UserWithID) 
+                                 VALUES (?, ?, ?, ?, ?);"""
+        data_tuple = (chat_id, user_id, username, dayofweek, user_with_id)
         self.cursor.execute(sqlite_insert_with_param, data_tuple)
         self.connection.commit()
         print("Python Variables inserted successfully into SqliteDb_developers table")
 
-    def read_my_data(self, username):
+    def read_my_data(self, username, user_with_id):
         with self.connection:
             return self.cursor.execute('''SELECT s.DayOfWeek FROM Schedule s
-                                        WHERE s.User = ?''', [username]).fetchall()
+                                        WHERE s.User = ? and s.UserWithID = ?''', [username, user_with_id]).fetchall()
 
     def getID(self, user_id):
         with self.connection:
             return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE UserID=? LIMIT 1''', [user_id]).fetchall()
 
-    def delete_row(self, dayofweek, user_id):
+    def delete_row(self, dayofweek, user_id, user_with_id):
         with self.connection:
-            self.cursor.execute('''DELETE FROM Schedule WHERE DayOfWeek = ? and UserID = ?''', [dayofweek, user_id])
+            self.cursor.execute('''DELETE FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
+                                [dayofweek, user_id, user_with_id])
             self.connection.commit()
             print("Python Variables deleted successfully into SqliteDb_developers table")
+
+    def clear(self, user_id):
+        with self.connection:
+            self.cursor.execute('''DELETE FROM Schedule WHERE UserID = ? and UserWithID = 0 ''', [user_id] )
+            self.connection.commit()
+            print("Users with UserWithID = 0 - cleared")
 
     def close(self):
         """ Закрываем текущее соединение с БД """
