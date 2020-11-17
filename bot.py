@@ -8,7 +8,7 @@ from SQLite3 import SQLighter
 
 bot = telebot.TeleBot(config.token)
 day = ''
-
+day_delete = ''
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
@@ -17,9 +17,25 @@ def send_welcome(message):
 Я бот-ассистент, напиши день, на который тебе назначить встречу, я его запомню
 """)
 
+@bot.message_handler(content_types=["text"])
+def delete_day(message):
+    if message.text == "удалить":
+        msg = bot.reply_to(message, "какой день удалить?")
+        bot.register_next_step_handler(msg, delete_day_select_day)
 
 @bot.message_handler(content_types=["text"])
-def repeat_all_messages(message):  # Название функции не играет никакой роли, в принципе
+def delete_day_select_day(message):
+    global day_delete
+    day_delete = message.text
+    db_worker = SQLighter(config.database)
+    delete_from_db = db_worker.delete_row(day_delete, message.from_user.id)
+    db_worker.close()
+
+
+
+
+@bot.message_handler(content_types=["text"])
+def get_day(message):  # Название функции не играет никакой роли, в принципе
     global day
     day = message.text
     name = message.from_user.first_name
@@ -60,6 +76,9 @@ def reply_to_another_user(message):
                          message.contact.first_name,
                          message.contact.last_name)[:-2])
     db_worker.close()
+
+
+
 
 
 # @bot.message_handler(commands=['getid'])
