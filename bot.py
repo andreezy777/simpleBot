@@ -18,39 +18,27 @@ def send_welcome(message):
 """)
 
 @bot.message_handler(content_types=["text"])
-def delete_day(message):
-    if message.text == "удалить":
-        msg = bot.reply_to(message, "какой день удалить?")
-        bot.register_next_step_handler(msg, delete_day_select_day)
-
-@bot.message_handler(content_types=["text"])
-def delete_day_select_day(message):
-    global day_delete
-    day_delete = message.text
-    db_worker = SQLighter(config.database)
-    delete_from_db = db_worker.delete_row(day_delete, message.from_user.id)
-    db_worker.close()
-
-
-
-
-@bot.message_handler(content_types=["text"])
-def get_day(message):  # Название функции не играет никакой роли, в принципе
+def walk_get_day(message):  # Название функции не играет никакой роли, в принципе
     global day
     day = message.text
     name = message.from_user.first_name
     chat_id = message.chat.id
     user_id = message.from_user.id
     username = message.from_user.username
-    bot.send_message(message.chat.id,
+    if str.lower(message.text) != "удалить":
+        bot.send_message(message.chat.id,
                      "{}({}) планирует прогулку в эту/это/этот: {}".format(name, username, message.text))
-    msg = bot.reply_to(message, "С кем планируете прогулку?")
-    bot.register_next_step_handler(msg, reply_to_another_user)
-    db_worker = SQLighter(config.database)
+        msg = bot.reply_to(message, "С кем планируете прогулку?")
+        bot.register_next_step_handler(msg, reply_to_another_user)
+        db_worker = SQLighter(config.database)
 
-    write_to_DB = db_worker.write_to(chat_id, user_id, username, message.text)
+        write_to_DB = db_worker.write_to(chat_id, user_id, username, message.text)
 
-    db_worker.close()
+        db_worker.close()
+    else:
+        msg = bot.reply_to(message, "какой день удалить?")
+        bot.register_next_step_handler(msg, delete_day_select_day)
+
 
 
 @bot.message_handler(content_types=['contact'])
@@ -65,21 +53,52 @@ def reply_to_another_user(message):
     print(get_ID)
     get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
     print(get_ID)
-    bot.send_message(get_ID, "У вас прогулка с Александрой в {}".format(day))
+    bot.send_message(get_ID, "У вас прогулка с {} {} в {}".format(message.from_user.first_name, message.from_user.
+                                                                  last_name, day))
     read_from_DB = db_worker.read_my_data(username)
 
     bot.send_message(message.chat.id,
                      "У вас запланированы прогулки на следующие дни: {} с {} {}".format(
                          ''.join(str(x) for x in read_from_DB).
                          replace('(', '').replace(')', '').
-                         replace('\'', '').replace(',', ', '),
+                         replace('\'', '').replace(',', ', ')[:-1],
                          message.contact.first_name,
                          message.contact.last_name)[:-2])
     db_worker.close()
 
 
 
+@bot.message_handler(content_types=["text"])
+def delete_day_select_day(message):
+    global day_delete
+    day_delete = message.text
 
+    msg = bot.reply_to(message, "С кем отменяете прогулку?")
+    bot.register_next_step_handler(msg, reply_to_another_user_about_delete)
+
+
+@bot.message_handler(content_types=['contact'])
+def reply_to_another_user_about_delete(message):
+    username = message.from_user.username
+    db_worker = SQLighter(config.database)
+    userID = message.contact.user_id
+    get_ID = db_worker.getID(userID)
+    get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
+    db_worker = SQLighter(config.database)
+    delete_from_db = db_worker.delete_row(day_delete, message.from_user.id, get_ID)
+    db_worker.close()
+    bot.send_message(get_ID, "У вас отменяется прогулка с {} {}  в {}".format(message.from_user.first_name, message.from_user.
+                                                                  last_name, day_delete))
+    read_from_DB = db_worker.read_my_data(username)
+
+    bot.send_message(message.chat.id,
+                     "У вас запланированы прогулки на следующие дни: {} с {} {}".format(
+                         ''.join(str(x) for x in read_from_DB).
+                             replace('(', '').replace(')', '').
+                             replace('\'', '').replace(',', ', ')[:-1],
+                         message.contact.first_name,
+                         message.contact.last_name)[:-2])
+    db_worker.close()
 
 # @bot.message_handler(commands=['getid'])
 # def getuserid(ID):  # Название функции не играет никакой роли, в принципе
