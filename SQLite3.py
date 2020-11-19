@@ -30,6 +30,10 @@ class SQLighter:
         with self.connection:
             return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE UserID=? LIMIT 1''', [user_id]).fetchall()
 
+    def getChatID(self, username):
+        with self.connection:
+            return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE User=? LIMIT 1''', [username]).fetchall()
+
     def delete_row(self, dayofweek, user_id, user_with_id):
         with self.connection:
             self.cursor.execute('''DELETE FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
