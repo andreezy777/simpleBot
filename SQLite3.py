@@ -40,9 +40,8 @@ class SQLighter:
 
     def check_row(self, dayofweek, user_id, user_with_id):
         with self.connection:
-            self.cursor.execute('''SELECT * FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
+            return self.cursor.execute('''SELECT * FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
                      [dayofweek, user_id, user_with_id]).fetchall()
-            return 0
 
     def delete_row(self, dayofweek, user_id, user_with_id): # check for cursor.rowcount
         with self.connection:

@@ -77,7 +77,7 @@ def cancel(message):
     bot.register_next_step_handler(msg, start)
 
 @bot.message_handler(commands=['delete'])
-def cancel(message):
+def delete(message):
     if str.lower(message.text) == '/cancel':
         msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
         bot.register_next_step_handler(msg, start)
@@ -260,8 +260,9 @@ def reply_to_another_user_about_delete(message):
             get_ID = db_worker.getID(userID)
             get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
             check_row = db_worker.check_row(day_delete, user_id, get_ID)
-            if check_row==0:
-                delete_day_select_day
+            if check_row == 0:
+                bot.register_next_step_handler((bot.reply_to(message, 'oooops, в такой день прогулки нету, попробуй еще')),
+                                               cancel)
             delete_from_db = db_worker.delete_row(day_delete, user_id, get_ID)
             db_worker.clear(user_id)
             bot.send_message(get_ID,
@@ -288,23 +289,26 @@ def reply_to_another_user_about_delete(message):
             get_ID = db_worker.getChatID(username_to)
             get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
             getUserID = db_worker.getUserID(get_ID)
-            getUserID = "{}".format(
-                ''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-            delete_from_db = db_worker.delete_row(day_delete, user_id, get_ID)
-            db_worker.clear(user_id)
-            bot.send_message(get_ID,
+            getUserID = "{}".format(''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
+            check_row = db_worker.check_row(day_delete, user_id, get_ID)
+            if check_row == 0:
+                bot.register_next_step_handler((bot.reply_to(message, 'oooops, на такой день прогулки не запланировано')), cancel)
+            else:
+                delete_from_db = db_worker.delete_row(day_delete, user_id, get_ID)
+                db_worker.clear(user_id)
+                bot.send_message(get_ID,
                          "У вас отменяется прогулка с {} {}  в {}".format(message.from_user.first_name,
                                                                           message.from_user.
                                                                           last_name, day_delete))
-            read_from_DB = db_worker.read_my_data(username, get_ID)
-            user_with = bot.get_chat_member(get_ID, getUserID)
-            bot.send_message(message.chat.id,
+                read_from_DB = db_worker.read_my_data(username, get_ID)
+                user_with = bot.get_chat_member(get_ID, getUserID)
+                bot.send_message(message.chat.id,
                          "У вас запланированы прогулки с {} {} на следующие дни: {}  ".format(
                          user_with.user.first_name, user_with.user.last_name,
                              ''.join(str(x) for x in read_from_DB).
                                  replace('(', '').replace(')', '').
                                  replace('\'', '').replace(',', ', ')[:-2]))
-            db_worker.close()
+                db_worker.close()
         elif (message.content_type != 'contact') & (message.text != '/cancel') & (message.text.startswith('@') == False):
             chat_id = message.chat.id
             msg = bot.reply_to(message, "Отправь файл контакта!")
