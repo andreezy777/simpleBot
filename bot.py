@@ -174,6 +174,9 @@ def walk_get_day(message):  # Название функции не играет 
         elif str.lower(message.text) == "/delete":
             msg = bot.reply_to(message, "какой день удалить?")
             bot.register_next_step_handler(msg, delete_day_select_day)
+        elif str.lower(message.text) == '/cancel':
+            msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
+            bot.register_next_step_handler(msg, start)
         db_worker.close()
     # else:
     #     msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
