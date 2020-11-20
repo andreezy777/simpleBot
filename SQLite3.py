@@ -32,9 +32,18 @@ class SQLighter:
 
     def getChatID(self, username):
         with self.connection:
-            return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE User=? LIMIT 1''', [username]).fetchall()
+            return self.cursor.execute('''SELECT  ChatID FROM Schedule WHERE lower(User) = lower(?) LIMIT 1''', [username]).fetchall()
 
-    def delete_row(self, dayofweek, user_id, user_with_id):
+    def getUserID(self, chat_id):
+        with self.connection:
+            return self.cursor.execute('''SELECT  UserID FROM Schedule WHERE ChatID=? LIMIT 1''', [chat_id]).fetchall()
+
+    def check_row(self, dayofweek, user_id, user_with_id):
+        with self.connection:
+            return self.cursor.execute('''SELECT * FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
+                     [dayofweek, user_id, user_with_id]).fetchall()
+
+    def delete_row(self, dayofweek, user_id, user_with_id): # check for cursor.rowcount
         with self.connection:
             self.cursor.execute('''DELETE FROM Schedule WHERE DayOfWeek = ? and UserID = ? and UserWithID = ?''',
                                 [dayofweek, user_id, user_with_id])
