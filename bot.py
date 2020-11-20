@@ -164,7 +164,7 @@ def walk_get_day(message):  # Название функции не играет 
         db_worker = SQLighter(config.database)
         user_with = 0
         write_to_DB = db_worker.write_to(chat_id, user_id, username, day, user_with)
-        if str.lower(message.text) != "/delete":
+        if str.lower(message.text) != "/delete" | str.lower(message.text) != '/cancel':
             bot.send_message(message.chat.id,
                           "{}({}) планирует прогулку в эту/это/этот: {}".format(name, username, message.text))
             msg = bot.reply_to(message,
