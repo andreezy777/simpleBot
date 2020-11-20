@@ -67,6 +67,9 @@ def help(message):
 
 @bot.message_handler(commands=['add_date'])
 def add_date(message):
+    if str.lower(message.text) == '/cancel':
+        msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
+        bot.register_next_step_handler(msg, start)
     msg = bot.reply_to(message, "Пиши день и дату, в которую ты планируешь встречу")
     bot.register_next_step_handler(msg, walk_get_day)
 
@@ -99,16 +102,17 @@ def schedule(message):
 
 @bot.message_handler(content_types=['contact'])
 def schedule_read(message):
-    if (message.content_type == 'contact'):
-        chat_id = message.chat.id
-        user_id = message.from_user.id
-        username = message.from_user.username
-        db_worker = SQLighter(config.database)
-        userID = message.contact.user_id
-        get_ID = db_worker.getID(userID)
-        get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-        read_from_DB = db_worker.read_my_data(username, get_ID)
-        bot.send_message(message.chat.id,
+    try:
+        if (message.content_type == 'contact'):
+            chat_id = message.chat.id
+            user_id = message.from_user.id
+            username = message.from_user.username
+            db_worker = SQLighter(config.database)
+            userID = message.contact.user_id
+            get_ID = db_worker.getID(userID)
+            get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
+            read_from_DB = db_worker.read_my_data(username, get_ID)
+            bot.send_message(message.chat.id,
                          "У вас запланированы прогулки с {} {} на следующие дни: {}  ".format(
                              message.contact.first_name,
                              message.contact.last_name)[:-2],
@@ -116,35 +120,37 @@ def schedule_read(message):
                          replace('(', '').replace(')', '').
                          replace('\'', '').replace(',', ', ')[:-2],
                          )
-        db_worker.close()
-    elif (message.content_type == 'text') & (message.text.startswith('@')):
-        chat_id = message.chat.id
-        user_id = message.from_user.id
-        username = message.from_user.username
-        username_to = message.text
-        username_to = username_to[1:]
-        db_worker = SQLighter(config.database)
-        get_ID = db_worker.getChatID(username_to)
-        get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-        getUserID = db_worker.getUserID(get_ID)
-        getUserID = "{}".format(
-            ''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-        read_from_DB = db_worker.read_my_data(username, get_ID)
-        user_with = bot.get_chat_member(get_ID, getUserID)
-        bot.send_message(message.chat.id,
+            db_worker.close()
+        elif (message.content_type == 'text') & (message.text.startswith('@')):
+            chat_id = message.chat.id
+            user_id = message.from_user.id
+            username = message.from_user.username
+            username_to = message.text
+            username_to = username_to[1:]
+            db_worker = SQLighter(config.database)
+            get_ID = db_worker.getChatID(username_to)
+            get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
+            getUserID = db_worker.getUserID(get_ID)
+            getUserID = "{}".format(
+                ''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
+            read_from_DB = db_worker.read_my_data(username, get_ID)
+            user_with = bot.get_chat_member(get_ID, getUserID)
+            bot.send_message(message.chat.id,
                          "У вас запланированы прогулки с {} {} на следующие дни: {}  ".format(
                              user_with.user.first_name, user_with.user.last_name,
                              ''.join(str(x) for x in read_from_DB).
                                  replace('(', '').replace(')', '').
                                  replace('\'', '').replace(',', ', ')[:-2]))
-        db_worker.close()
-    elif (message.content_type != 'contact') & (message.text != '/cancel') & (message.text.startswith('@') == False):
-        chat_id = message.chat.id
-        msg = bot.reply_to(message, "Отправь файл контакта!")
-        bot.register_next_step_handler(msg, reply_to_another_user)
-    elif str.lower(message.text) == '/cancel':
-        msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
-        bot.register_next_step_handler(msg, start)
+            db_worker.close()
+        elif (message.content_type != 'contact') & (message.text != '/cancel') & (message.text.startswith('@') == False):
+            chat_id = message.chat.id
+            msg = bot.reply_to(message, "Отправь файл контакта!")
+            bot.register_next_step_handler(msg, reply_to_another_user)
+        elif str.lower(message.text) == '/cancel':
+            msg = bot.reply_to(message, "Отправляю в начало, воспользуйся /start")
+            bot.register_next_step_handler(msg, start)
+    except Exception as e:
+        bot.register_next_step_handler((bot.reply_to(message, 'oooops, попробуй еще раз ввести username')), schedule_read)
 
 
 #@bot.message_handler(content_types=["text"])
