@@ -1,0 +1,16 @@
+[Unit]
+Description=Telegram bot 'Scheduler'
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/src/simpleBot/
+ExecStart=/usr/bin/python3 /usr/src/simpleBot/bot.py
+
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
