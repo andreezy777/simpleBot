@@ -8,6 +8,7 @@ import telebot
 from SQLite3 import SQLighter
 import logging
 import cherrypy
+import os
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -20,12 +21,15 @@ day = ''
 day_delete = ''
 
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 WEBHOOK_HOST = 'scheduler.hmainnetwork.keenetic.pro'
 WEBHOOK_PORT = 8443  # 443, 80, 88 или 8443 (порт должен быть открыт!)
 WEBHOOK_LISTEN = '0.0.0.0'  # На некоторых серверах придется указывать такой же IP, что и выше
 
-WEBHOOK_SSL_CERT = '/home/webhook_cert.pem'  # Путь к сертификату
-WEBHOOK_SSL_PRIV = '/home/webhook_pkey.pem'  # Путь к приватному ключу
+WEBHOOK_SSL_CERT = os.path.join(BASE_DIR, "webhook_cert.pem")
+WEBHOOK_SSL_PRIV = os.path.join(BASE_DIR, "webhook_pkey.pem")
 
 WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
 WEBHOOK_URL_PATH = "/%s/" % (config.token)
