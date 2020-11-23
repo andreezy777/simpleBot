@@ -2,7 +2,7 @@ FROM python:3
 
 RUN apt-get update
 
-RUN pip3 install pyTelegramBotAPI
+RUN pip3 install pyTelegramBotAPI cherrypy
 
 RUN apt-get install -y sqlite3 
 
