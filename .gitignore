@@ -6,3 +6,5 @@ nohup.out
 user_schedule.db
 icstest.py
 *.pem
+credentials.json
+*.html
