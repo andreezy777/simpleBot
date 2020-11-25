@@ -24,7 +24,7 @@ class SQLighter:
     def read_my_data(self, username, user_with_id):
         with self.connection:
             return self.cursor.execute('''SELECT s.DayOfWeek FROM Schedule s
-                                        WHERE s.User = ? and s.UserWithID = ?''', [username, user_with_id]).fetchall()
+                                        WHERE (s.User = ? and s.UserWithID = ?) or (s.User = ? and s.UserWithID = ?) ''', [username, user_with_id, user_with_id,username]).fetchall()
 
     def getID(self, user_id):
         with self.connection:
