@@ -55,7 +55,6 @@ class WebhookServer(object):
 # def gotostart(message):
 #     msg = bot.reply_to(message, "/start")
 
-
 @bot.message_handler(commands=['start'])
 def start(message):
     # if str.lower(message.text) == '/cancel':
@@ -142,7 +141,8 @@ def schedule_read(message):
             userID = message.contact.user_id
             get_ID = db_worker.getID(userID)
             get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-            read_from_DB = db_worker.read_my_data(username, get_ID,username)
+            read_from_DB = db_worker.read_my_data(username, get_ID,user_id)
+            print(read_from_DB)
             last_name = message.contact.last_name
             if last_name != None:
                 bot.send_message(message.chat.id,
@@ -176,7 +176,7 @@ def schedule_read(message):
             getUserID = db_worker.getUserID(get_ID)
             getUserID = "{}".format(
                 ''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
-            read_from_DB = db_worker.read_my_data(username, get_ID,username)
+            read_from_DB = db_worker.read_my_data(username, get_ID,user_id)
             user_with = bot.get_chat_member(get_ID, getUserID)
             last_name = user_with.user.last_name
             if last_name != None:
@@ -251,7 +251,7 @@ def reply_to_another_user(message):
             get_ID = "{}".format(''.join(str(x) for x in get_ID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
             write_to_DB = db_worker.write_to(chat_id, user_id, username, day, get_ID)
             db_worker.clear(user_id)
-            read_from_DB = db_worker.read_my_data(username, get_ID,username)
+            read_from_DB = db_worker.read_my_data(username, get_ID,userID)
             bot.send_message(get_ID,
                              "У вас новая прогулка с {} {} в {}".format(message.from_user.first_name, message.from_user.
                                                                         last_name, day))
@@ -290,7 +290,7 @@ def reply_to_another_user(message):
                 ''.join(str(x) for x in getUserID).replace('(', '').replace(')', '').replace('\'', '')[:-1])
             write_to_DB = db_worker.write_to(chat_id, user_id, username, day, get_ID)
             db_worker.clear(user_id)
-            read_from_DB = db_worker.read_my_data(username, get_ID,username)
+            read_from_DB = db_worker.read_my_data(username, get_ID,user_id)
             bot.send_message(get_ID,
                              "У вас новая прогулка с {} {} в {}".format(message.from_user.first_name, message.from_user.
                                                                         last_name, day))
@@ -309,7 +309,7 @@ def reply_to_another_user(message):
                 last_name = ""
                 bot.send_message(message.chat.id,
                                  "У вас запланированы прогулки с {} {} на следующие дни: {}  ".format(
-                                     user_with.user.first_name, user_with.user.last_name,
+                                     user_with.user.first_name, last_name,
                                      ''.join(str(x) for x in read_from_DB).
                                          replace('(', '').replace(')', '').
                                          replace('\'', '').replace(',', ', ')[:-2]
@@ -361,7 +361,7 @@ def reply_to_another_user_about_delete(message):
                          "У вас отменяется прогулка с {} {}  в {}".format(message.from_user.first_name,
                                                                           message.from_user.
                                                                           last_name, day_delete))
-            read_from_DB = db_worker.read_my_data(username, get_ID,username)
+            read_from_DB = db_worker.read_my_data(username, get_ID,user_id)
 
             last_name = message.contact.last_name
             if last_name != None:
@@ -406,7 +406,7 @@ def reply_to_another_user_about_delete(message):
                          "У вас отменяется прогулка с {} {}  в {}".format(message.from_user.first_name,
                                                                           message.from_user.
                                                                           last_name, day_delete))
-                read_from_DB = db_worker.read_my_data(username, get_ID,username)
+                read_from_DB = db_worker.read_my_data(username, get_ID,user_id)
                 user_with = bot.get_chat_member(get_ID, getUserID)
                 last_name = user_with.user.last_name
                 if last_name != None:
@@ -435,6 +435,7 @@ def reply_to_another_user_about_delete(message):
     except Exception as e:
         print(e)
         bot.register_next_step_handler((bot.reply_to(message, 'oooops, попробуй еще раз ввести username')), reply_to_another_user_about_delete)
+
 
 
 # @bot.message_handler(commands=['getid'])
