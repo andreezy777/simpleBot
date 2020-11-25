@@ -21,10 +21,13 @@ class SQLighter:
         self.connection.commit()
         print("Python Variables inserted successfully into SqliteDb_developers table")
 
-    def read_my_data(self, username, user_with_id):
+    def read_my_data(self, username, user_with_id,user_with_id_1,username_1):
         with self.connection:
             return self.cursor.execute('''SELECT s.DayOfWeek FROM Schedule s
-                                        WHERE (s.User = ? and s.UserWithID = ?) or (s.User = ? and s.UserWithID = ?) ''', [username, user_with_id, user_with_id,username]).fetchall()
+                                        WHERE (s.User = ? and s.UserWithID = ?)
+                                        UNION 
+                                        SELECT s.DayOfWeek FROM Schedule s
+                                        WHERE (s.User = ? and s.UserWithID = ?) ''', [username, user_with_id, user_with_id_1,username_1]).fetchall()
 
     def getID(self, user_id):
         with self.connection:
